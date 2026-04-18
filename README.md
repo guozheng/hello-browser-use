@@ -27,9 +27,14 @@ This project uses `uv` for fast Python dependency management.
 
 Once the environment is successfully initialized and your `.env` is configured, you can run the example scripts!
 
-To run the `top_movies.py` example, use:
+To run the `top_movies.py` agent, use:
 ```bash
 uv run top_movies.py
 ```
 
-*(Alternatively, you can manually activate the environment with `source .venv/bin/activate` and run `python top_movies.py`)*
+To run the `top_amazon.py` agent (which asks for a product and finds its Amazon rating and price), use:
+```bash
+uv run top_amazon.py
+```
+
+*(Alternatively, you can manually activate the environment with `source .venv/bin/activate` and run the scripts with `python <script_name>.py`)*
