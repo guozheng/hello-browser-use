@@ -5,7 +5,7 @@ from rich.markdown import Markdown
 from dotenv import load_dotenv
 load_dotenv()
 
-from browser_use_sdk import AsyncBrowserUse
+from browser_use_sdk.v3 import AsyncBrowserUse
 
 
 async def main():
@@ -21,15 +21,14 @@ async def main():
         "Format the output nicely as a markdown list."
     )
     
-    task = client.run(task_prompt)
+    task = client.run(task_prompt, model="claude-sonnet-4.6")
     
     print("Agent started! Streaming steps...", flush=True)
-    async for step in task:
-        # Prints verbose updates step-by-step as the cloud agent executes it!
-        content = step.next_goal or step.memory or "Processing..."
-        print(f"-> [Step {step.number}] {content}", flush=True)
-        if step.actions:
-            print(f"   Actions: {step.actions}", flush=True)
+    step_num = 1
+    async for msg in task:
+        if msg.summary:
+            print(f"-> [Step {step_num}] {msg.summary}", flush=True)
+            step_num += 1
 
     console = Console()
     if task.output:
