@@ -37,4 +37,9 @@ To run the `top_amazon.py` agent (which asks for a product and finds its Amazon 
 uv run top_amazon.py
 ```
 
+To run the `gmail.py` agent (which logs into Gmail with a persistent profile and fetches recent emails with their timestamps), use:
+```bash
+uv run gmail.py
+```
+
 *(Alternatively, you can manually activate the environment with `source .venv/bin/activate` and run the scripts with `python <script_name>.py`)*

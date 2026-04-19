@@ -17,3 +17,8 @@ For AI agents, use this documentation to understand how to use the browser-use-s
 - **Purpose**: Asks the user for a product to search, then finds the top 5 most popular products matching the input on Amazon, along with their product rating and current price.
 - **Tools & Capabilities**: Uses `browser-use-sdk` to search Amazon, extract product data, and summarize ratings and prices into a formatted response.
 - **Execution**: `uv run top_amazon.py`
+
+### 3. Gmail Inbox Checker Agent (`gmail.py`)
+- **Purpose**: Automates logging into Gmail (using persistent custom profiles) and checks the inbox for emails matching specific criteria (e.g., from 'Google'), extracting their subject, sender, and timestamp.
+- **Tools & Capabilities**: Uses `browser-use-sdk` streaming, multi-step tasks across a persistent session, and data extraction from web applications.
+- **Execution**: `uv run gmail.py`
