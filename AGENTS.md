@@ -22,3 +22,8 @@ For AI agents, use this documentation to understand how to use the browser-use-s
 - **Purpose**: Automates logging into Gmail (using persistent custom profiles) and checks the inbox for emails matching specific criteria (e.g., from 'Google'), extracting their subject, sender, and timestamp.
 - **Tools & Capabilities**: Uses `browser-use-sdk` streaming, multi-step tasks across a persistent session, and data extraction from web applications.
 - **Execution**: `uv run cloud/gmail.py`
+
+### 4. Hacker News Top 5 Agent (`open-source/hacker_news_top5.py`)
+- **Purpose**: Automates the task of finding the top 5 most popular posts on Hacker News.
+- **Tools & Capabilities**: Uses open-source `browser-use` package configured with a local Chrome browser profile to search the web and extract data.
+- **Execution**: `uv run open-source/hacker_news_top5.py`

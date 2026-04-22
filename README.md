@@ -42,4 +42,9 @@ To run the `cloud/gmail.py` agent (which logs into Gmail with a persistent profi
 uv run cloud/gmail.py
 ```
 
+To run the `open-source/hacker_news_top5.py` agent (which finds the top 5 stories on Hacker News using a local open-source setup), use:
+```bash
+uv run open-source/hacker_news_top5.py
+```
+
 *(Alternatively, you can manually activate the environment with `source .venv/bin/activate` and run the scripts with `python <script_name>.py`)*
