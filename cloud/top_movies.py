@@ -11,26 +11,26 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from dotenv import load_dotenv
 load_dotenv(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), '.env'))
 
-from browser_use_sdk.v3 import AsyncBrowserUse
+from browser_use_sdk import AsyncBrowserUse
 
 
 async def main():
-    client = AsyncBrowserUse()
-    task = client.run(
-        "Search for the new movies released in 2026 and print the top 10 movies. Return the result directly as formatted markdown. Do NOT write your results to any JSON file and do NOT mention saving to output.json in your final answer.",
-        model="gemini-3-flash"
+    client = AsyncBrowserUse(api_key=os.environ["BROWSER_USE_API_KEY"])
+    task = await client.tasks.create_task(
+        task="Search for the new movies released in 2026 and print the top 10 movies. Return the result directly as formatted markdown. Do NOT write your results to any JSON file and do NOT mention saving to output.json in your final answer.",
+        llm="gemini-3-flash-preview"
     )
     
     print("Agent started! Streaming steps...", flush=True)
     step_num = 1
-    async for msg in task:
-        if msg.summary:
-            print(f"-> [Step {step_num}] {msg.summary}", flush=True)
-            step_num += 1
+    async for step in task.stream():
+        print(f"-> [Step {step_num}] {step.next_goal}", flush=True)
+        step_num += 1
 
+    result = await task.complete()
     console = Console()
-    if task.output:
-        console.print(Markdown(task.output))
+    if result.output:
+        console.print(Markdown(result.output))
         
         from datetime import datetime
         from workspace_util import upload_string_to_workspace
@@ -41,7 +41,7 @@ async def main():
         workspace_id = await upload_string_to_workspace(
             client=client,
             workspace_name="top-movies",
-            content=task.output,
+            content=result.output,
             filename=filename
         )
         print(f"Successfully uploaded! (Workspace ID: {workspace_id})", flush=True)

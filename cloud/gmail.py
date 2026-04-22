@@ -11,48 +11,54 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from dotenv import load_dotenv
 load_dotenv(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), '.env'))
 
-from browser_use_sdk.v3 import AsyncBrowserUse
+from browser_use_sdk import AsyncBrowserUse
 
 async def main():
-    client = AsyncBrowserUse()
+    client = AsyncBrowserUse(api_key=os.environ["BROWSER_USE_API_KEY"])
     
-    profiles_response = await client.profiles.list(query="bot-profile")
-    if profiles_response.items:
-        profile = profiles_response.items[0]
-    else:
-        profile = await client.profiles.create(name="bot-profile")
+    # Find or create a profile named "bot-profile"
+    profiles_response = await client.profiles.list_profiles()
+    profile = None
+    for p in profiles_response.items:
+        if p.name == "bot-profile":
+            profile = p
+            break
+    if not profile:
+        profile = await client.profiles.create_profile(name="bot-profile")
     
-    session = await client.sessions.create(profile_id=profile.id, model="gemini-3-flash")
+    session = await client.sessions.create_session(profile_id=profile.id)
     print(f"Live view: {session.live_url}")
 
-    login_task = client.run(
-        "Log into gmail with the user aibluejay.mountain@gmail.com",
+    # Task 1: Log into Gmail
+    login_task = await client.tasks.create_task(
+        task="Log into gmail with the user aibluejay.mountain@gmail.com",
         session_id=session.id,
-        model="gemini-3-flash"
+        llm="gemini-3-flash-preview"
     )
 
     step_num = 1
-    async for msg in login_task:
-        if msg.summary:
-            print(f"-> [Step {step_num}] {msg.summary}", flush=True)
-            step_num += 1
+    async for step in login_task.stream():
+        print(f"-> [Step {step_num}] {step.next_goal}", flush=True)
+        step_num += 1
     
-    check_email_task = client.run(
-        "Check the inbox for any emails from 'Google' and print the subject, sender, and timestamp/date of the email.",
+    # Task 2: Check emails
+    check_email_task = await client.tasks.create_task(
+        task="Check the inbox for unread emails and print the subject, sender, and timestamp/date of the email.",
         session_id=session.id,
-        model="gemini-3-flash"
+        llm="gemini-3-flash-preview"
     )
 
-    async for msg in check_email_task:
-        if msg.summary:
-            print(f"-> [Step {step_num}] {msg.summary}", flush=True)
-            step_num += 1
+    async for step in check_email_task.stream():
+        print(f"-> [Step {step_num}] {step.next_goal}", flush=True)
+        step_num += 1
 
+    # Get final result
+    result = await check_email_task.complete()
     console = Console()
-    if getattr(check_email_task, "result", None) and getattr(check_email_task.result, "output", None):
-        console.print(Markdown(check_email_task.result.output))
+    if result.output:
+        console.print(Markdown(result.output))
     
-    await client.sessions.stop(session.id)
+    await client.sessions.update_session(session.id, action="stop")
 
 if __name__ == "__main__":
     asyncio.run(main())
